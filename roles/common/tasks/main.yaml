@@ -1,0 +1,23 @@
+---
+- name: install packages from os repositories
+  include: install-packages.yaml
+
+- name: install packages via pip
+  include: install-pip-packages.yaml
+
+- name: update editor alternatives
+  alternatives:
+    name: editor
+    path: /usr/bin/vim.nox
+
+- name: set timezone
+  timezone:
+    name: '{{ host_timezone }}'
+  notify:
+    - restart ntp
+    - restart cron
+
+- name: enable locale
+  locale_gen:
+    name: '{{ host_locale }}'
+    state: present

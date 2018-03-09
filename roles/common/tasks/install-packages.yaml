@@ -1,0 +1,38 @@
+---
+- name: debian sources
+  template:
+    src: debian-sources.list.j2
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  when: ansible_distribution == 'Debian'
+  notify:
+    - apt update
+
+- name: setup external package repositories
+  include: setup-external-repositories.yaml
+
+- name: upgrade existing packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_distribution == 'Debian'
+  notify:
+    - apt autoclean
+    - apt autoremove
+
+- name: Install software packages (apt)
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_distribution == 'Debian'
+  with_items:
+    - '{{ packages | mandatory }}'
+  notify:
+    - apt autoclean
+    - apt autoremove

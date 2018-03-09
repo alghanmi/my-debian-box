@@ -1,0 +1,22 @@
+---
+- name: apt update
+  apt:
+    update_cache: yes
+
+- name: apt autoclean
+  apt:
+    autoclean: yes
+
+- name: apt autoremove
+  apt:
+    autoremove: yes
+
+- name: restart ntp
+  service:
+    name: ntp
+    state: restarted
+
+- name: restart cron
+  service:
+    name: cron
+    state: restarted

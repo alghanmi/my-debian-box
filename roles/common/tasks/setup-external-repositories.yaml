@@ -1,0 +1,76 @@
+---
+- name: weechat signing key
+  apt_key:
+    id: '0xD1820DB22A11534E'
+    keyserver: '{{ keyserver }}'
+    state: present
+  when: '"weechat" in packages'
+
+- name: weechat sources
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: weechat
+    mode: 0644
+    update_cache: yes
+  with_items:
+    - 'deb https://weechat.org/{{ ansible_lsb.id | lower }} {{ ansible_lsb.codename }} main'
+    - 'deb-src https://weechat.org/{{ ansible_lsb.id | lower }} {{ ansible_lsb.codename }} main'
+  when: '"weechat" in packages'
+
+- name: nodejs signing key
+  apt_key:
+    id: '0x1655A0AB68576280'
+    keyserver: '{{ keyserver }}'
+    state: present
+  when: '"nodejs" in packages'
+
+- name: nodejs sources
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: nodejs
+    mode: 0644
+    update_cache: yes
+  with_items:
+    - 'deb https://deb.nodesource.com/node_8.x jessie main'
+    - 'deb-src https://deb.nodesource.com/node_8.x jessie main'
+  when: '"nodejs" in packages'
+
+- name: google chrome signing key
+  apt_key:
+    id: '{{ item }}'
+    keyserver: '{{ keyserver }}'
+    state: present
+  with_items:
+    - '0x7721F63BD38B4796'
+    - '0xA040830F7FAC5991'
+  when: '"google-chrome-stable" in packages'
+
+- name: google chrome sources
+  apt_repository:
+    repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+    state: present
+    filename: google-chrome
+    mode: 0644
+    update_cache: yes
+  when: '"google-chrome-stable" in packages'
+
+- name: virtualbox signing key
+  apt_key:
+    id: '{{ item }}'
+    keyserver: '{{ keyserver }}'
+    state: present
+  with_items:
+    - '0xA2F683C52980AECF'
+    - '0x54422A4B98AB5139'
+  when: '"virtualbox" in packages'
+
+- name: virtualbox sources
+  apt_repository:
+    repo: 'deb http://download.virtualbox.org/virtualbox/debian stretch contrib'
+    state: present
+    filename: virtualbox
+    mode: 0644
+    update_cache: yes
+  when: 'packages | search("virtualbox-*")'
