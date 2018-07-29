@@ -4,6 +4,8 @@
     name: '{{ uitem.username }}'
     comment: '{{ uitem.name }}'
     shell: '{{ uitem.shell | default(omit) }}'
+    groups:
+      - '{{ admin_group }}'
     state: present
   with_items: '{{ superusers }}'
   loop_control:
