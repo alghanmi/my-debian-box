@@ -1,0 +1,14 @@
+---
+# Run common role on all instances
+- hosts: all
+  become: yes
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+    - include_role:
+        name: common
+
+    - include_role:
+        name: user-setup
+      with_items: '{{ superusers }}'
