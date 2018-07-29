@@ -33,8 +33,8 @@
     mode: 0644
     update_cache: yes
   with_items:
-    - 'deb https://deb.nodesource.com/node_8.x jessie main'
-    - 'deb-src https://deb.nodesource.com/node_8.x jessie main'
+    - 'deb https://deb.nodesource.com/node_10.x jessie main'
+    - 'deb-src https://deb.nodesource.com/node_10.x jessie main'
   when: '"nodejs" in packages'
 
 - name: google chrome signing key
