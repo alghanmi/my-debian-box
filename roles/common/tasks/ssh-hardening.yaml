@@ -1,0 +1,99 @@
+---
+- name: set ssh protocol to 2
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[P|p]rotocol'
+    insertafter: '^#[\s]*[P|p]rotocol|^#[\s]*[P|p]ort'
+    line: 'Protocol 2'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: set ssh to port 22
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[P|p]ort'
+    insertafter: '^#[\s]*[P|p]ort'
+    line: 'Port 22'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: disable root login via ssh
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[P|p]ermit[R|r]oot[L|l]ogin'
+    insertafter: '^#[\s]*[P|p]ermit[R|r]oot[L|l]ogin'
+    line: 'PermitRootLogin no'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: disable password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[P|p]assword[A|a]uthentication'
+    insertafter: '^#[\s]*[P|p]assword[A|a]uthentication'
+    line: 'PasswordAuthentication no'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: disable user-environment options
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[P|p]ermit[U|u]ser[E|e]nvironment'
+    insertafter: '^#^[P|p]ermit[U|u]ser[E|e]nvironment'
+    line: 'PermitUserEnvironment no'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: set ClientAliveInterval to 5 minutes
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[C|c]lient[A|a]live[I|i]nterval'
+    insertafter: '^#[C|c]lient[A|a]live[I|i]nterval'
+    line: 'ClientAliveInterval 300'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: set ClientAliveCountMax to 3
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[C|c]lient[A|a]live[C|c]ount[M|m]ax'
+    insertafter: '^#[C|c]lient[A|a]live[C|c]ount[M|m]ax'
+    line: 'ClientAliveCountMax 3'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: disable x11 forwarding
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[X|x]11[F|f]orwarding'
+    insertafter: '^#[X|x]11[F|f]orwarding'
+    line: 'X11Forwarding no'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: ssh allowgroup configuration
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowGroups '
+    insertafter: '^#[\s]*[A|a]llow[G|g]roups'
+    line: 'AllowGroups {{ (admin_groups | union(user_groups)) | join(" ") }}'
+    create: no
+    backup: yes
+  notify:
+    - restart ssh

@@ -24,6 +24,18 @@
     name: editor
     path: /usr/bin/vim.nox
 
+- name: create user groups
+  group:
+    name: '{{ item }}'
+    state: present
+    system: no
+  with_items:
+    - '{{ admin_groups }}'
+    - '{{ user_groups }}'
+
+- name: ssh hardening
+  include: ssh-hardening.yaml
+
 - name: set timezone
   timezone:
     name: '{{ host_timezone }}'
