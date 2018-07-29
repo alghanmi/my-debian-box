@@ -1,0 +1,5 @@
+[workstation]
+work.example.com
+
+[dev]
+dev-server.example.com

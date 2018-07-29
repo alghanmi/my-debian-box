@@ -1,0 +1,14 @@
+---
+host_timezone: America/Los_Angeles
+host_locale: en_US.UTF-8
+
+host_packages: []
+host_python_packages: []
+
+debian_backports: false
+
+superusers:
+  - name: Rami Al-Ghanmi
+    username: rami
+    shell: /usr/bin/zsh
+    authorized_key: https://github.com/alghanmi.keys
