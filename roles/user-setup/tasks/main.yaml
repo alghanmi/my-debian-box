@@ -1,0 +1,32 @@
+---
+- name: create super users
+  user:
+    name: '{{ uitem.username }}'
+    comment: '{{ uitem.name }}'
+    shell: '{{ uitem.shell | default(omit) }}'
+    state: present
+  with_items: '{{ superusers }}'
+  loop_control:
+    loop_var: uitem
+
+- name: add super-users authorized keys
+  authorized_key:
+    user: '{{ uitem.username }}'
+    key: '{{ uitem.authorized_key }}'
+    state: present
+  when: uitem.authorized_key is defined
+  with_items: '{{ superusers }}'
+  loop_control:
+    loop_var: uitem
+
+- name: add super-users to sudoers list
+  lineinfile:
+    path: /etc/sudoers.d/10-super-users
+    regexp: '^{{ uitem.username }} ALL='
+    line: '{{ uitem.username }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+    create: yes
+    state: present
+  with_items: '{{ superusers }}'
+  loop_control:
+    loop_var: uitem
