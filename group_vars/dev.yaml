@@ -1,0 +1,22 @@
+---
+group_packages: []
+group_python_packages: []
+
+packages: '{{ package_list.base                   |
+              union(package_list.basic)           |
+              union(package_list.build)           |
+              union(package_list.dev)             |
+              union(package_list.irc)             |
+              union(package_list.java)            |
+              union(package_list.networking)      |
+              union(package_list.shell)           |
+              union(group_packages | default([])) |
+              union(host_packages  | default([])) |
+              unique }}'
+
+python_packages: '{{  python_package_list.base                   |
+                      union(python_package_list.ansible)         |
+                      union(python_package_list.dev)             |
+                      union(group_python_packages | default([])) |
+                      union(host_python_packages  | default([])) |
+                      unique }}'
