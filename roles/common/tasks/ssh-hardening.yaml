@@ -43,6 +43,17 @@
     backup: yes
   notify: restart ssh
 
+- name: disable challenge response authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[C|c]hallenge[R|r]esponse[A|a]uthentication'
+    insertafter: '^#[\s]*[C|c]hallenge[R|r]esponse[A|a]uthentication'
+    line: 'ChallengeResponseAuthentication no'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
 - name: disable user-environment options
   lineinfile:
     dest: /etc/ssh/sshd_config
@@ -97,3 +108,36 @@
     backup: yes
   notify:
     - restart ssh
+
+- name: harden key exchange
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[K|k]ex[A|a]lgorithms'
+    insertafter: '^#[K|k]ex[A|a]lgorithms'
+    line: 'KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: harden symmetric ciphers
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[C|c]iphers'
+    insertafter: '^#[C|c]iphers'
+    line: 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
+
+- name: harden message authentication codes
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^[M|m]ACs'
+    insertafter: '^#[M|m]ACs'
+    line: 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com'
+    state: present
+    create: no
+    backup: yes
+  notify: restart ssh
