@@ -47,3 +47,7 @@
   locale_gen:
     name: '{{ host_locale }}'
     state: present
+
+- name: set hostname
+  hostname:
+    name: '{{ ansible_host }}'
