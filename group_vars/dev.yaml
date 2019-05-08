@@ -6,6 +6,7 @@ packages: '{{ package_list.base                   |
               union(package_list.basic)           |
               union(package_list.build)           |
               union(package_list.dev)             |
+              union(package_list.docker)          |
               union(package_list.irc)             |
               union(package_list.java)            |
               union(package_list.networking)      |

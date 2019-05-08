@@ -18,6 +18,24 @@
     - 'deb-src https://weechat.org/{{ ansible_lsb.id | lower }} {{ ansible_lsb.codename }} main'
   when: '"weechat" in packages'
 
+- name: docker signing key
+  apt_key:
+    id: '0x8D81803C0EBFCD88'
+    keyserver: '{{ keyserver }}'
+    state: present
+  when: '"docker-ce" in packages'
+
+- name: docker sources
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: weechat
+    mode: 0644
+    update_cache: yes
+  with_items:
+    - 'deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_lsb.codename }} stable'
+  when: '"docker-ce" in packages'
+
 - name: nodejs signing key
   apt_key:
     id: '0x1655A0AB68576280'

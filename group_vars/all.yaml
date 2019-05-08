@@ -75,6 +75,12 @@ package_list:
     - ruby-dev
     - subversion
 
+  docker:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose
+
   java:
     - ant
     - maven
