@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+
+-A INPUT -i lo -j ACCEPT
+-A OUTPUT -o lo -j ACCEPT
+
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+{% for port in open_ports %}
+-A INPUT -m state --state NEW -p tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+
+
+-P INPUT DROP
+-P FORWARD DROP
+-P OUTPUT ACCEPT 
+
+COMMIT
