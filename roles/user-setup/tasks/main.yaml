@@ -7,6 +7,7 @@
     groups:
       - '{{ admin_group }}'
     state: present
+    append: yes
   with_items: '{{ superusers }}'
   loop_control:
     loop_var: uitem
