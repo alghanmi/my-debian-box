@@ -11,7 +11,7 @@ deb-src https://deb.debian.org/debian/ {{ ansible_lsb.codename }}-updates main c
 # Debian Security Updates
 deb https://deb.debian.org/debian-security {{ ansible_lsb.codename }}/updates main contrib non-free
 deb-src https://deb.debian.org/debian-security {{ ansible_lsb.codename }}/updates main contrib non-free
-{% if ansible_lsb.release == "stable" and debian_backports %}
+{% if ansible_lsb.codename == "stretch" and debian_backports %}
 
 # Debian backports
 deb http://ftp.debian.org/debian {{ ansible_lsb.codename }}-backports main

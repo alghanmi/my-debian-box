@@ -25,3 +25,6 @@
   service:
     name: cron
     state: restarted
+
+- name: update iptables
+  shell: iptables-restore < /etc/iptables.conf

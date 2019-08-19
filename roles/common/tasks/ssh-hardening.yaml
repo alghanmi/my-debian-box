@@ -10,7 +10,7 @@
     backup: yes
   notify: restart ssh
 
-- name: set ssh to port 22
+- name: set ssh to port
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[P|p]ort'

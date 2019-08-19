@@ -29,7 +29,7 @@
   apt_repository:
     repo: '{{ item }}'
     state: present
-    filename: weechat
+    filename: docker
     mode: 0644
     update_cache: yes
   with_items:
@@ -51,8 +51,8 @@
     mode: 0644
     update_cache: yes
   with_items:
-    - 'deb https://deb.nodesource.com/node_10.x jessie main'
-    - 'deb-src https://deb.nodesource.com/node_10.x jessie main'
+    - 'deb https://deb.nodesource.com/node_10.x {{ ansible_lsb.codename }} main'
+    - 'deb-src https://deb.nodesource.com/node_10.x {{ ansible_lsb.codename }} main'
   when: '"nodejs" in packages'
 
 - name: google chrome signing key
@@ -86,7 +86,7 @@
 
 - name: virtualbox sources
   apt_repository:
-    repo: 'deb http://download.virtualbox.org/virtualbox/debian stretch contrib'
+    repo: 'deb http://download.virtualbox.org/virtualbox/debian {{ ansible_lsb.codename }} contrib'
     state: present
     filename: virtualbox
     mode: 0644

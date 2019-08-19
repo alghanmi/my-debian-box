@@ -26,13 +26,11 @@
 
 - name: Install software packages (apt)
   apt:
-    name: '{{ item }}'
+    name: '{{ packages | mandatory }}'
     state: present
     update_cache: yes
     cache_valid_time: 3600
   when: ansible_distribution == 'Debian'
-  with_items:
-    - '{{ packages | mandatory }}'
   notify:
     - apt autoclean
     - apt autoremove
