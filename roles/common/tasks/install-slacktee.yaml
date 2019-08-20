@@ -1,0 +1,43 @@
+- name: download slacktee
+  get_url:
+    url: "https://raw.githubusercontent.com/coursehero/slacktee/master/slacktee.sh"
+    dest: "/usr/local/bin/slacktee"
+    mode: 0775
+    owner: root
+    group: root
+
+- name: slecktee conf
+  template:
+    src: slacktee.conf.j2
+    dest: /etc/slacktee.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy reboot-required-slack-notification script
+  copy:
+    src: reboot-required-slack-notification.sh
+    dest: /usr/local/bin/reboot-required-slack-notification.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: deploy reboot-required-slack-notification cron job
+  cron:
+    name: reboot-required slack notification
+    job: /usr/local/bin/reboot-required-slack-notification.sh
+    hour: "0,6,12,18"
+
+- name: copy reboot-alert script
+  copy:
+    src: reboot-alert.sh
+    dest: /usr/local/bin/reboot-alert.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: deploy reboot-alert cron job
+  cron:
+    name: reboot slack notification
+    job: /usr/local/bin/reboot-alert.sh
+    special_time: reboot

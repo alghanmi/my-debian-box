@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+webhook_url="{{ slack_alerts.web_hook | default('') }}"
+token="{{ slack_alerts.upload_token | default('') }}"
+channel="{{ slack_alerts.channel }}"
+tmp_dir="{{ slack_alerts.tmp_dir | default('/tmp') }}"
+username="{{ slack_alerts.username }}"
+icon="{{ slack_alerts.icon }}"
+attachment="{{ slack_alerts.attachment }}"
