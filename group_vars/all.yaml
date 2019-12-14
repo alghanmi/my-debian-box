@@ -11,6 +11,7 @@ package_list:
 
   basic:
     - apt-transport-https
+    - apt-listchanges
     - apticron
     - bash-completion
     - curl
