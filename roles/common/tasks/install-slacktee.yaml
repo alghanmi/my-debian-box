@@ -41,3 +41,8 @@
     name: reboot slack notification
     job: /usr/local/bin/reboot-alert.sh
     special_time: reboot
+
+#- name: forward root emails to slack
+#  copy:
+#    content: "| /usr/local/bin/slacktee"
+#    dest: 
