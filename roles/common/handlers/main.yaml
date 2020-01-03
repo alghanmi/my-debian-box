@@ -27,4 +27,7 @@
     state: restarted
 
 - name: update iptables
-  shell: iptables-restore < /etc/iptables.conf
+  shell: iptables-restore < /etc/iptables/rules.v4
+
+- name: update ip6tables
+  shell: ip6tables-restore < /etc/iptables/rules.v6

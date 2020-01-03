@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% for ns in dns_resolvers %}
+nameserver {{ ns }}
+{% endfor %}

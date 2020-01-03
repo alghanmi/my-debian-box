@@ -52,15 +52,45 @@
   hostname:
     name: '{{ ansible_host }}'
 
+- name: set dns resolvers
+  template:
+    src: templates/resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ dns_resolvers }}'
+  when: dns_resolvers | length > 0
+
 - name: create iptables rules
   template:
     src: templates/iptables.conf.j2
-    dest: /etc/iptables.conf
+    dest: /etc/iptables/rules.v4
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  notify:
+    - update iptables
+
+- name: create ip6tables rules
+  template:
+    src: templates/ip6tables.conf.j2
+    dest: /etc/iptables/rules.v6
     owner: root
     group: root
     mode: 0644
   notify:
-    - update iptables
+    - update ip6tables
+
+- name: filesystem mount points
+  mount:
+    path: '{{ item.path }}'
+    src: '{{ item.src }}'
+    fstype: '{{ item.fstype }}'
+    state: mounted
+    backup: yes
+  with_items: '{{ fs_mounts }}'
 
 - name: install slacktee for alerts
   include: install-slacktee.yaml

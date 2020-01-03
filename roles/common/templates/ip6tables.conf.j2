@@ -6,9 +6,11 @@
 :OUTPUT ACCEPT [0:0]
 
 -A INPUT -i lo -j ACCEPT
--A INPUT ! -i lo -s 127.0.0.0/8 -j REJECT
+-A INPUT ! -i lo -s ::1/128 -j REJECT
 
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+-A INPUT -p icmpv6 -j ACCEPT
 
 {% for port in open_ports_tcp %}
 -A INPUT -m state --state NEW -p tcp --dport {{ port }} -j ACCEPT

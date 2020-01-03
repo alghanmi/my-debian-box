@@ -12,6 +12,10 @@ admin_groups:
 user_groups:
   - users
 
+fs_mounts: []
+
+dns_resolvers: []
+
 slack_alerts:
   upload_token: ''
   channel: general
