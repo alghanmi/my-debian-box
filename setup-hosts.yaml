@@ -12,3 +12,13 @@
     - include_role:
         name: user-setup
       with_items: '{{ superusers }}'
+
+- hosts: server
+  become: yes
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+    - include_role:
+        name: wireguard
+      when: wireguard_server

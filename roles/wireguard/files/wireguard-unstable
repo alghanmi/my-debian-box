@@ -1,0 +1,3 @@
+Package: wireguard*
+Pin: release a=unstable
+Pin-Priority: 700
