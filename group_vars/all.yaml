@@ -20,6 +20,7 @@ package_list:
     - htop
     - python
     - python-pip
+    - rsync
     - screen
     - tmux
     - tree
