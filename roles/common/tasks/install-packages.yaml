@@ -34,3 +34,7 @@
   notify:
     - apt autoclean
     - apt autoremove
+
+- name: Install software packages from source (not using apt)
+  include: install-packages-from-src.yaml
+  when: install_nonpackaged_software
