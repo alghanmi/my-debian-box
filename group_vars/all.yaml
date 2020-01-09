@@ -29,7 +29,6 @@ package_list:
     - vim-scripts
 
   shell:
-    - yadm
     - zsh
     - zsh-antigen
 
