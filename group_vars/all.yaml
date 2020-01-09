@@ -29,6 +29,7 @@ package_list:
     - vim-scripts
 
   shell:
+    - grc
     - zsh
     - zsh-antigen
 
