@@ -64,6 +64,8 @@
   shell:
     cmd: wg genkey > /etc/wireguard/wg-private.key
     creates: /etc/wireguard/wg-private.key
+  notify:
+    - restart wg0
 
 - name: set file permissions for wireguard private key
   file:
@@ -76,6 +78,8 @@
   shell:
     cmd: cat /etc/wireguard/wg-private.key | wg pubkey > /etc/wireguard/wg-public.key
     creates: /etc/wireguard/wg-public.key
+  notify:
+    - restart wg0
 
 - name: set file permissions for wireguard public key
   file:
@@ -98,6 +102,8 @@
     mode: 0600
   vars:
     - wireguard_private_key: "{{ wireguard_private_key_reg['content'] | b64decode }}"
+  notify:
+    - restart wg0
 
 - name: enable and start wireguard service
   service:
