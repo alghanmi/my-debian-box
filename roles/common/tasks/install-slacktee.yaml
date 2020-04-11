@@ -27,6 +27,7 @@
     name: reboot-required slack notification
     job: /usr/local/bin/reboot-required-slack-notification.sh
     hour: "0,6,12,18"
+    minute: "0"
 
 - name: copy reboot-alert script
   copy:
