@@ -7,6 +7,8 @@ keyserver: hkps://hkps.pool.sks-keyservers.net
 host_timezone: UTC
 host_locale: en_US.UTF-8
 
+superusers: []
+
 admin_groups:
   - admin
 
@@ -14,6 +16,11 @@ user_groups:
   - users
 
 fs_mounts: []
+
+open_ports_tcp:
+  - 22
+
+open_ports_udp: []
 
 dns_resolvers: []
 

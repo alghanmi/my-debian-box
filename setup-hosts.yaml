@@ -11,7 +11,7 @@
 
     - include_role:
         name: user-setup
-      with_items: '{{ superusers }}'
+      with_items: '{{ superusers | default([]) }}'
 
 - hosts: server
   become: yes
@@ -21,4 +21,6 @@
   tasks:
     - include_role:
         name: wireguard
-      when: wireguard_server
+      when:
+        - wireguard_sever is defined
+        - wireguard_sever is True
