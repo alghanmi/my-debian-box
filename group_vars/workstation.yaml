@@ -1,32 +1,32 @@
 ---
 group_packages:
-  - exim4
+  #  - exim4
   - neofetch
 
 group_python_packages: []
 
-packages: '{{ package_list.base                   |
-              union(package_list.basic)           |
-              union(package_list.build)           |
-              union(package_list.dev)             |
-              union(package_list.fonts)           |
-              union(package_list.gnome)           |
-              union(package_list.irc)             |
-              union(package_list.java)            |
-              union(package_list.media)           |
-              union(package_list.misc)            |
-              union(package_list.networking)      |
-              union(package_list.office)          |
-              union(package_list.shell)           |
-              union(package_list.virtualization)  |
-              union(group_packages | default([])) |
-              union(host_packages  | default([])) |
-              unique }}'
+packages: "{{ package_list.base                   |
+  union(package_list.basic)           |
+  union(package_list.build)           |
+  union(package_list.dev)             |
+  union(package_list.fonts)           |
+  union(package_list.gnome)           |
+  union(package_list.irc)             |
+  union(package_list.java)            |
+  union(package_list.media)           |
+  union(package_list.misc)            |
+  union(package_list.networking)      |
+  union(package_list.office)          |
+  union(package_list.shell)           |
+  union(package_list.virtualization)  |
+  union(group_packages | default([])) |
+  union(host_packages  | default([])) |
+  unique }}"
 
-python_packages: '{{  python_package_list.base                   |
-                      union(python_package_list.ansible)         |
-                      union(python_package_list.dev)             |
-                      union(python_package_list.powerline)       |
-                      union(group_python_packages | default([])) |
-                      union(host_python_packages  | default([])) |
-                      unique }}'
+python_packages: "{{  python_package_list.base                   |
+  union(python_package_list.ansible)         |
+  union(python_package_list.dev)             |
+  union(python_package_list.powerline)       |
+  union(group_python_packages | default([])) |
+  union(host_python_packages  | default([])) |
+  unique }}"
