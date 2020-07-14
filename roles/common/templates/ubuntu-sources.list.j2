@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+# Ubuntu Base Repositories
+deb http://archive.ubuntu.com/ubuntu {{ ansible_lsb.codename }} main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu {{ ansible_lsb.codename }} main restricted universe multiverse
+
+# Ubuntu Release Updates
+deb http://archive.ubuntu.com/ubuntu {{ ansible_lsb.codename }}-updates main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu {{ ansible_lsb.codename }}-updates main restricted universe multiverse
+
+# Ubuntu Security Updates
+deb http://security.ubuntu.com/ubuntu {{ ansible_lsb.codename }}-security main restricted universe multiverse
+deb-src http://security.ubuntu.com/ubuntu {{ ansible_lsb.codename }}-security main restricted universe multiverse
+{% if backports %}
+
+# Ubuntu Backports
+deb http://archive.ubuntu.com/ubuntu {{ ansible_lsb.codename }}-backports main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu {{ ansible_lsb.codename }}-backports main restricted universe multiverse
+{% endif %}{% if partner_repos %}
+
+deb http://archive.canonical.com/ubuntu {{ ansible_lsb.codename }} partner
+deb-src http://archive.canonical.com/ubuntu {{ ansible_lsb.codename }} partner
+{% endif %}

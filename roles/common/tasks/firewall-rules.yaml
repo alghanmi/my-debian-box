@@ -1,0 +1,54 @@
+---
+- name: create iptables rules
+  template:
+    src: templates/iptables.conf.j2
+    dest: /etc/iptables/rules.v4
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  when: ansible_distribution == 'Debian'
+  notify:
+    - update iptables
+
+- name: create ip6tables rules
+  template:
+    src: templates/ip6tables.conf.j2
+    dest: /etc/iptables/rules.v6
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_distribution == 'Debian'
+  notify:
+    - update ip6tables
+
+- name: ufw (tcp)
+  ufw:
+    rule: allow
+    port: "{{ item | string }}"
+    proto: tcp
+  when: ansible_distribution == 'Ubuntu'
+  with_items: "{{ open_ports_tcp }}"
+
+- name: ufw (udp)
+  ufw:
+    rule: allow
+    port: "{{ item | string }}"
+    proto: udp
+  when: ansible_distribution == 'Ubuntu'
+  with_items: "{{ open_ports_udp }}"
+
+- name: set default ufw policies
+  ufw:
+    policy: "{{ item.policy }}"
+    direction: "{{ item.direction }}"
+  with_items:
+    - { direction: "incoming", policy: "deny" }
+    - { direction: "routed", policy: "deny" }
+    - { direction: "outgoing", policy: "allow" }
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Enable ufw
+  ufw:
+    state: enabled
+  when: ansible_distribution == 'Ubuntu'
