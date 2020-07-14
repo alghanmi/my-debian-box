@@ -26,6 +26,11 @@
     name: cron
     state: restarted
 
+- name: restart smtpd
+  service:
+    name: opensmtpd
+    state: restarted
+
 - name: update iptables
   shell: iptables-restore < /etc/iptables/rules.v4
 

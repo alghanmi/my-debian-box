@@ -88,3 +88,7 @@
 
 - name: install slacktee for alerts
   include: install-slacktee.yaml
+
+- name: mail relay setup
+  include: mail-relay.yaml
+  when: setup_mail_relay

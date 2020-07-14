@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+
+table aliases file:/etc/aliases
+table secrets file:/etc/opensmtpd/secrets
+
+listen on localhost
+
+action "local" maildir alias <aliases>
+action "relay" relay host "{{ smtp_protocol }}://{{ smtp_profile }}@{{ smtp_server }}:{{ smtp_port }}" auth <secrets>
+
+match for local action "local"
+match from local for any action "relay"

@@ -25,8 +25,17 @@ open_ports_udp: []
 
 dns_resolvers: []
 
+smtp_port: 465
+smtp_profile: email
+smtp_username: scott
+smtp_password: tiger
+smtp_hostname: smtp.gmail.com
+smtp_protocol: smtps
+
+setup_mail_relay: false
+
 slack_alerts:
-  upload_token: ''
+  upload_token: ""
   channel: general
   tmp_dir: /tmp
   username: slacktee
