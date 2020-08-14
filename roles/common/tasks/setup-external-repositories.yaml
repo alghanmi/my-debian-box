@@ -20,8 +20,8 @@
 
 - name: docker signing key
   apt_key:
-    id: "0x8D81803C0EBFCD88"
-    keyserver: "{{ keyserver }}"
+    id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+    url: https://download.docker.com/linux/ubuntu/gpg
     state: present
   when: '"docker-ce" in packages'
 
