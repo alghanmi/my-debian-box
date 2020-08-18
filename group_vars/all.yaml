@@ -110,7 +110,6 @@ package_list:
     - zip
 
   office:
-    - firefox-esr
     - gimp
     - gimp-data-extras
     - gimp-plugin-registry
@@ -119,12 +118,15 @@ package_list:
     - meld
     - shutter
 
+  office_basic:
+    - google-chrome-stable
+
   fonts:
     - fonts-inconsolata
 
   media:
     - libavcodec-extra
-    - libdvdread4
+    - libdvdread7
     - mpv
     - vlc
 
