@@ -3,7 +3,7 @@ backports: false
 partner_repos: false
 install_nonpackaged_software: false
 
-keyserver: hkps://hkps.pool.sks-keyservers.net
+keyserver: hkps://keyserver.ubuntu.com
 
 host_timezone: UTC
 host_locale: en_US.UTF-8
