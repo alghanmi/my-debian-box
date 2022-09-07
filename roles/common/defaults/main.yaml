@@ -37,6 +37,7 @@ smtp_username: scott
 smtp_password: tiger
 smtp_hostname: smtp.gmail.com
 smtp_protocol: smtps
+root_email_aliases: []
 
 slack_alerts:
   upload_token: ""

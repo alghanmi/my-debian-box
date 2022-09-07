@@ -47,6 +47,18 @@
   notify:
     - restart smtpd
 
+- name: add root email alias
+  ansible.builtin.lineinfile:
+    dest: /etc/aliases
+    regexp: '^root'
+    insertafter: '^# root:'
+    line: "root: {{ root_email_aliases }}"
+    state: present
+    create: no
+    backup: yes
+  when: (root_email_aliases | length) > 0
+  notify: restart smtpd
+
 - name: enable smtpd
   ansible.builtin.service:
     name: opensmtpd

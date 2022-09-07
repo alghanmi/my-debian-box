@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+
+{% for addr in uitem.uitem.forward_mail %}{{ addr }} 
+{% endfor %}

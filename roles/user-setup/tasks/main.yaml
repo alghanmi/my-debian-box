@@ -1,6 +1,6 @@
 ---
 - name: create super users
-  user:
+  ansible.builtin.user:
     name: "{{ uitem.username }}"
     comment: "{{ uitem.name }}"
     shell: "{{ uitem.shell | default(omit) }}"
@@ -9,11 +9,12 @@
     state: present
     append: yes
   with_items: "{{ superusers }}"
+  register: user_creation_result
   loop_control:
     loop_var: uitem
 
 - name: add super-users authorized keys
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ uitem.username }}"
     key: "{{ uitem.authorized_key }}"
     state: present
@@ -23,7 +24,7 @@
     loop_var: uitem
 
 - name: add super-users to sudoers list
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sudoers.d/10-super-users
     regexp: "^{{ uitem.username }} ALL="
     line: "{{ uitem.username }} ALL=(ALL) NOPASSWD: ALL"
@@ -31,5 +32,17 @@
     create: yes
     state: present
   with_items: "{{ superusers }}"
+  loop_control:
+    loop_var: uitem
+
+- name: setup email forwarding
+  ansible.builtin.template:
+    src: forward
+    dest: "{{ uitem.home }}/.forward"
+    owner: "{{ uitem.uid }}"
+    group: "{{ uitem.group }}"
+    mode: 0644
+  with_items: "{{ user_creation_result.results }}"
+  when: uitem.uitem.forward_mail is defined
   loop_control:
     loop_var: uitem

@@ -165,3 +165,14 @@
     backup: yes
     validate: sshd -T -f %s
   notify: restart ssh
+
+- name: allow gpg agent forwarding
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^StreamLocalBindUnlink'
+    line: 'StreamLocalBindUnlink yes'
+    state: present
+    create: no
+    backup: yes
+    validate: sshd -T -f %s
+  notify: restart ssh
