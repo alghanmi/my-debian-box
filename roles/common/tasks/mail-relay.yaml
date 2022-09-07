@@ -1,16 +1,14 @@
 ---
 - name: install openstmpd
-  apt:
-    name: opensmtpd
+  ansible.builtin.apt:
+    name:
+      - opensmtpd
+      - opensmtpd-extras
+      - mailutils
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
-  notify:
-    - apt autoclean
-    - apt autoremove
 
 - name: create opensmtpd configuration directory
-  file:
+  ansible.builtin.file:
     path: /etc/opensmtpd
     state: directory
     owner: root
@@ -18,8 +16,8 @@
     mode: 0755
 
 - name: host mailname
-  copy:
-    content: "{{ mailname | default(ansible_fqdn) }}"
+  ansible.builtin.copy:
+    content: "{{ mailname | default(inventory_hostname) }}"
     dest: /etc/mailname
     owner: root
     group: root
@@ -28,7 +26,7 @@
     - restart smtpd
 
 - name: relay secrets
-  copy:
+  ansible.builtin.copy:
     content: "{{ smtp_profile }} {{ smtp_username }}:{{ smtp_password }}\n"
     dest: /etc/opensmtpd/secrets
     owner: root
@@ -38,17 +36,18 @@
     - restart smtpd
 
 - name: opensmtpd configuration
-  template:
+  ansible.builtin.template:
     src: smtpd.conf.j2
     dest: /etc/smtpd.conf
     owner: root
     group: root
     mode: 0644
     backup: true
+    validate: smtpd -n -f %s
   notify:
     - restart smtpd
 
 - name: enable smtpd
-  service:
+  ansible.builtin.service:
     name: opensmtpd
     enabled: yes

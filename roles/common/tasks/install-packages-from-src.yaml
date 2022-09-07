@@ -1,20 +1,21 @@
 ---
-# YADM package in repositories is very old, therefore, installing from github
 - name: install yadm from source
-  get_url:
-    url: https://github.com/TheLocehiliosan/yadm/raw/master/yadm
-    dest: /usr/local/bin/yadm
-    owner: root
-    group: root
-    mode: 0755
+  block:
+    - name: install yadm bin
+      ansible.builtin.get_url:
+        url: https://github.com/TheLocehiliosan/yadm/raw/master/yadm
+        dest: /usr/local/bin/yadm
+        owner: root
+        group: root
+        mode: 0755
 
-- name: install yadm shell completion
-  get_url:
-    url: '{{ item.url }}'
-    dest: '{{ item.dest }}'
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    - { url: 'https://raw.githubusercontent.com/TheLocehiliosan/yadm/master/completion/yadm.zsh_completion', dest: '/usr/share/zsh/vendor-completions/_yadm'}
-    - { url: 'https://raw.githubusercontent.com/TheLocehiliosan/yadm/master/completion/yadm.bash_completion', dest: '/usr/share/bash-completion/completions/yadm'}
+    - name: install yadm shell completion
+      ansible.builtin.get_url:
+        url: '{{ item.url }}'
+        dest: '{{ item.dest }}'
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+        - { url: 'https://raw.githubusercontent.com/TheLocehiliosan/yadm/master/completion/zsh/_yadm', dest: '/usr/share/zsh/vendor-completions/_yadm'}
+        - { url: 'https://raw.githubusercontent.com/TheLocehiliosan/yadm/master/completion/bash/yadm', dest: '/usr/share/bash-completion/completions/yadm'}

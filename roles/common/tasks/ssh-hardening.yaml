@@ -1,6 +1,6 @@
 ---
 - name: set ssh protocol to 2
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[P|p]rotocol'
     insertafter: '^#[\s]*[P|p]rotocol|^#[\s]*[P|p]ort'
@@ -8,10 +8,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: set ssh to port
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[P|p]ort'
     insertafter: '^#[\s]*[P|p]ort'
@@ -19,10 +20,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: disable root login via ssh
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[P|p]ermit[R|r]oot[L|l]ogin'
     insertafter: '^#[\s]*[P|p]ermit[R|r]oot[L|l]ogin'
@@ -30,10 +32,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: disable password authentication
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[P|p]assword[A|a]uthentication'
     insertafter: '^#[\s]*[P|p]assword[A|a]uthentication'
@@ -41,10 +44,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: disable challenge response authentication
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[C|c]hallenge[R|r]esponse[A|a]uthentication'
     insertafter: '^#[\s]*[C|c]hallenge[R|r]esponse[A|a]uthentication'
@@ -55,7 +59,7 @@
   notify: restart ssh
 
 - name: disable user-environment options
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[P|p]ermit[U|u]ser[E|e]nvironment'
     insertafter: '^#^[P|p]ermit[U|u]ser[E|e]nvironment'
@@ -63,10 +67,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: set ClientAliveInterval to 5 minutes
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[C|c]lient[A|a]live[I|i]nterval'
     insertafter: '^#[C|c]lient[A|a]live[I|i]nterval'
@@ -74,10 +79,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: set ClientAliveCountMax to 3
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[C|c]lient[A|a]live[C|c]ount[M|m]ax'
     insertafter: '^#[C|c]lient[A|a]live[C|c]ount[M|m]ax'
@@ -85,10 +91,11 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: disable x11 forwarding
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[X|x]11[F|f]orwarding'
     insertafter: '^#[X|x]11[F|f]orwarding'
@@ -96,43 +103,45 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh
 
 - name: ssh allowgroup configuration
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^AllowGroups '
     insertafter: '^#[\s]*[A|a]llow[G|g]roups'
     line: 'AllowGroups {{ (admin_groups | union(user_groups)) | join(" ") }}'
     create: no
     backup: yes
+    validate: sshd -T -f %s
   notify:
     - restart ssh
 
 - name: harden key exchange
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[K|k]ex[A|a]lgorithms'
     insertafter: '^#[K|k]ex[A|a]lgorithms'
-    line: 'KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group14-sha256'
+    line: 'KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256'
     state: present
     create: no
     backup: yes
   notify: restart ssh
 
 - name: harden symmetric ciphers
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[C|c]iphers'
     insertafter: '^#[C|c]iphers'
-    line: 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr'
+    line: 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr'
     state: present
     create: no
     backup: yes
   notify: restart ssh
 
 - name: harden message authentication codes
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[M|m]ACs'
     insertafter: '^#[M|m]ACs'
@@ -140,4 +149,19 @@
     state: present
     create: no
     backup: yes
+    validate: sshd -T -f %s
+  notify: restart ssh
+
+- name: specify the order of hostkey algorithms
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^#[H|h]ost[K|k]ey'
+    block: |
+      HostKey /etc/ssh/ssh_host_ed25519_key
+      HostKey /etc/ssh/ssh_host_rsa_key
+      HostKey /etc/ssh/ssh_host_ecdsa_key
+    state: present
+    create: no
+    backup: yes
+    validate: sshd -T -f %s
   notify: restart ssh

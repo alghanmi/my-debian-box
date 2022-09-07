@@ -1,35 +1,33 @@
 ---
 package_list:
   base:
+    - locales
     - lsb-release
-    - ntp
     - openssh-server
     - openssl
-    - ssh
+    - openssh-client
     - sudo
+    - systemd-timesyncd
+    - whiptail
+
 
   basic:
     - apt-transport-https
-    - apt-listchanges
-    - apticron
-    - bash-completion
+    - ca-certificates
     - curl
     - git
     - htop
     - python3
-    - python3-pip
     - rsync
-    - screen
-    - tmux
+    - software-properties-common
     - tree
-    - unattended-upgrades
-    - vim-nox
     - vim-scripts
+    - vim-tiny  
 
   shell:
     - grc
     - zsh
-    - zsh-antigen
+    - tmux
 
   build:
     - binutils
@@ -44,6 +42,11 @@ package_list:
     - tcptraceroute
     - traceroute
 
+  networking_basic:
+    - dnsutils
+    - tcptraceroute
+    - traceroute
+
   dev:
     - astyle
     - colordiff
@@ -54,8 +57,6 @@ package_list:
     - golang
     - golang-golang-x-tools
     - highlight
-    - ipython
-    - ipython3
     - jq
     - libffi-dev
     - libgit2-dev
@@ -75,7 +76,7 @@ package_list:
     - docker-ce
     - docker-ce-cli
     - containerd.io
-    - docker-compose
+    - docker-compose-plugin
 
   java:
     - ant
@@ -95,6 +96,14 @@ package_list:
     - texlive-latex-recommended
     - texlive-science
     - texlive-xetex
+
+  arhives:
+    - p7zip-full
+    - par2
+    - unace
+    - unrar
+    - unzip
+    - zip
 
   misc:
     - lshw
@@ -146,7 +155,9 @@ distro_package_list:
     - ufw
 
 python_package_list:
-  base:
+  base: []
+  
+  basic:
     - pip
     - virtualenv
     - requests

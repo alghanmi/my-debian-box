@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+[Resolve]
+DNS={% for ns in dns_resolvers_ns %}{{ ns }} 
+{% endfor %}
+
+{% if dns_resolvers_dns_sec %}DNSSEC=yes
+{% endif %}
+{% if dns_resolvers_dns_over_tls %}DNSOverTLS=yes
+{% endif %}

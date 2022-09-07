@@ -3,3 +3,4 @@
   pip:
     name: '{{ python_packages | default([]) }}'
     state: latest
+  when: '(python_packages | length) > 0'

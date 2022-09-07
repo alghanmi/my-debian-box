@@ -1,38 +1,32 @@
 ---
 - name: apt update
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
 
 - name: apt autoclean
-  apt:
+  ansible.builtin.apt:
     autoclean: yes
 
 - name: apt autoremove
-  apt:
+  ansible.builtin.apt:
     autoremove: yes
 
 - name: restart ssh
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
 
-- name: restart ntp
-  service:
-    name: ntp
-    state: restarted
-
 - name: restart cron
-  service:
+  ansible.builtin.service:
     name: cron
     state: restarted
 
 - name: restart smtpd
-  service:
+  ansible.builtin.service:
     name: opensmtpd
     state: restarted
 
-- name: update iptables
-  shell: iptables-restore < /etc/iptables/rules.v4
-
-- name: update ip6tables
-  shell: ip6tables-restore < /etc/iptables/rules.v6
+- name: restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted

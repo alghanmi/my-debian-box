@@ -1,43 +1,34 @@
 ---
-- name: install ansible dependencies
-  apt:
-    name:
-      - sudo
-      - apt-transport-https
-      - dirmngr
-      - python
-      - python-simplejson
-    state: present
+- name: Update aptitude repo and cache on all
+  ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: 3600
-  when: ansible_distribution == 'Debian'
+    autoclean: yes
 
 - name: install ansible dependencies
-  apt:
+  ansible.builtin.apt:
     name:
-      - sudo
       - apt-transport-https
-      - gnupg
+      - ca-certificates
+      - lsb-release
       - python3
-      - python3-simplejson
+      - software-properties-common
+      - sudo
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
-  when: ansible_distribution == 'Ubuntu'
 
 - name: install packages from os repositories
-  include: install-packages.yaml
+  ansible.builtin.include_tasks: install-packages.yaml
 
 - name: install packages via pip
-  include: install-pip-packages.yaml
+  ansible.builtin.include_tasks: install-pip-packages.yaml
 
 - name: update editor alternatives
-  alternatives:
+  community.general.alternatives:
     name: editor
-    path: /usr/bin/vim.nox
+    path: /usr/bin/vim.basic
 
 - name: create user groups
-  group:
+  ansible.builtin.group:
     name: "{{ item }}"
     state: present
     system: no
@@ -46,49 +37,79 @@
     - "{{ user_groups }}"
 
 - name: ssh hardening
-  include: ssh-hardening.yaml
+  ansible.builtin.include_tasks: ssh-hardening.yaml
 
 - name: set timezone
-  timezone:
+  community.general.timezone:
     name: "{{ host_timezone }}"
   notify:
-    - restart ntp
     - restart cron
 
 - name: enable locale
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ host_locale }}"
     state: present
 
 - name: set hostname
-  hostname:
-    name: "{{ ansible_host }}"
+  block:
+    - name: set hostname via systemd
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+        use: systemd
+
+    - name: add hostname to loopback address
+      ansible.builtin.lineinfile:
+        dest: /etc/hosts
+        regex: '^127\.0\.0\.1.*'
+        line: "127.0.0.1 localhost {{ inventory_hostname }}"
+        state: present
+        create: no
+        backup: yes
+  notify:
+    - restart systemd-resolved
 
 - name: set dns resolvers
-  template:
-    src: templates/resolv.conf.j2
-    dest: /etc/resolv.conf
-    owner: root
-    group: root
-    mode: 0644
-  with_items: "{{ dns_resolvers }}"
-  when: dns_resolvers | length > 0
+  block:
+    - name: create resolve.conf config directory
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d/
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
 
-- name: filesystem mount points
-  mount:
-    path: "{{ item.path }}"
-    src: "{{ item.src }}"
-    fstype: "{{ item.fstype }}"
-    state: mounted
-    backup: yes
-  with_items: "{{ fs_mounts }}"
+    - name: set dns resolvers
+      ansible.builtin.template:
+        src: templates/dns_servers.conf.j2
+        dest: /etc/systemd/resolved.conf.d/dns_servers.conf
+        owner: root
+        group: root
+        mode: 0644
+      with_items: "{{ dns_resolvers_ns }}"
+
+# - name: filesystem mount points
+#   mount:
+#     path: "{{ item.path }}"
+#     src: "{{ item.src }}"
+#     fstype: "{{ item.fstype }}"
+#     state: mounted
+#     backup: yes
+#   with_items: "{{ fs_mounts }}"
 
 - name: firewall setup
-  include: firewall-rules.yaml
+  ansible.builtin.include_tasks: firewall-rules.yaml
 
 - name: install slacktee for alerts
-  include: install-slacktee.yaml
+  ansible.builtin.include_tasks: install-slacktee.yaml
 
 - name: mail relay setup
-  include: mail-relay.yaml
+  ansible.builtin.include_tasks: mail-relay.yaml
   when: setup_mail_relay
+
+- name: install unattended-upgrades
+  ansible.builtin.include_tasks: unattended-upgrades.yaml
+  when: unattended_upgrades
+
+- name: Autoremove unused packages
+  apt:
+    autoremove: yes

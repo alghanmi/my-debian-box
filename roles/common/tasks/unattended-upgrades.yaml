@@ -1,0 +1,27 @@
+---
+# Verification: sudo unattended-upgrades --dry-run --debug
+
+- name: install unattended-upgrades
+  ansible.builtin.apt:
+    name:
+      - unattended-upgrades
+      - update-notifier-common
+    state: present
+
+- name: unattended-upgrades config file
+  ansible.builtin.template:
+    src: unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+
+- name: unattended-upgrades periodic config file
+  ansible.builtin.template:
+    src: unattended-upgrades-periodic.j2
+    dest: /etc/apt/apt.conf.d/10periodic
+    owner: root
+    group: root
+    mode: 0644
+    backup: true

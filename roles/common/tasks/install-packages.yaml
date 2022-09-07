@@ -1,74 +1,37 @@
 ---
-- name: debian sources
-  template:
-    src: debian-sources.list.j2
-    dest: /etc/apt/sources.list
-    owner: root
-    group: root
-    mode: 0644
-    backup: yes
-  when: ansible_distribution == 'Debian'
-  notify:
-    - apt update
-
 - name: ubuntu sources
-  template:
+  ansible.builtin.template:
     src: ubuntu-sources.list.j2
     dest: /etc/apt/sources.list
     owner: root
     group: root
     mode: 0644
     backup: yes
-  when: ansible_distribution == 'Ubuntu'
   notify:
     - apt update
 
 - name: setup external package repositories
-  include: setup-external-repositories.yaml
+  ansible.builtin.include_tasks: setup-external-repositories.yaml
 
 - name: upgrade existing packages
-  apt:
+  ansible.builtin.apt:
     upgrade: dist
     update_cache: yes
     cache_valid_time: 3600
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   notify:
     - apt autoclean
     - apt autoremove
 
 - name: Install software packages (apt)
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages | mandatory }}"
     state: present
     update_cache: yes
     cache_valid_time: 3600
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-  notify:
-    - apt autoclean
-    - apt autoremove
-
-- name: Install distribution specific packages
-  apt:
-    name: "{{ distro_package_list.debian | mandatory }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 3600
-  when: ansible_distribution == 'Debian'
-  notify:
-    - apt autoclean
-    - apt autoremove
-
-- name: Install distribution specific packages
-  apt:
-    name: "{{ distro_package_list.ubuntu | mandatory }}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 3600
-  when: ansible_distribution == 'Ubuntu'
   notify:
     - apt autoclean
     - apt autoremove
 
 - name: Install software packages from source (not using apt)
-  include: install-packages-from-src.yaml
+  ansible.builtin.include_tasks: install-packages-from-src.yaml
   when: install_nonpackaged_software
