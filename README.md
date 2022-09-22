@@ -40,3 +40,10 @@ Keep in mind if your current username is different than the remote superuser (e.
 ```bash
 ansible-playbook -i hosts setup-hosts.yaml --user root
 ```
+
+## Manual Steps
+- Copy over public GPG Keys
+- Copy GitHub configuration
+- Personal YADM
+- Setup GPG Sockets on source and estination
+- GPG Remote Forwarding https://www.ecliptik.com/Forwarding-gpg-agent-over-SSH/, https://gist.github.com/TimJDFletcher/85fafd023c81aabfad57454111c1564d

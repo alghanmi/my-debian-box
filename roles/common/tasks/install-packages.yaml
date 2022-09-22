@@ -35,3 +35,13 @@
 - name: Install software packages from source (not using apt)
   ansible.builtin.include_tasks: install-packages-from-src.yaml
   when: install_nonpackaged_software
+
+- name: install snap core
+  community.general.snap:
+    name: core
+
+- name: ensure snapd is enabled.
+  ansible.builtin.systemd:
+    name: snapd.socket
+    enabled: true
+    state: started

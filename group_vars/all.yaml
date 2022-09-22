@@ -17,14 +17,17 @@ package_list:
     - curl
     - git
     - htop
+    - jq
     - python3
+    - ripgrep
     - rsync
     - software-properties-common
     - tree
     - vim-scripts
-    - vim-tiny  
+    - vim-tiny
 
   shell:
+    - fzf
     - grc
     - zsh
     - tmux
@@ -38,12 +41,14 @@ package_list:
     - dnsutils
     - ldap-utils
     - nmap
+    - tailscale
     - tcpdump
     - tcptraceroute
     - traceroute
 
   networking_basic:
     - dnsutils
+    - tailscale
     - tcptraceroute
     - traceroute
 
@@ -73,10 +78,11 @@ package_list:
     - subversion
 
   docker:
+    - containerd.io
     - docker-ce
     - docker-ce-cli
-    - containerd.io
     - docker-compose-plugin
+    - python3-pip
 
   java:
     - ant
@@ -172,6 +178,10 @@ python_package_list:
     - simplejson
     - six
     - ansible
+  
+  docker:
+    - docker
+    - docker-compose
 
   dev:
     - speedtest-cli

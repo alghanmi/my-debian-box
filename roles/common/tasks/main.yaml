@@ -85,16 +85,29 @@
         owner: root
         group: root
         mode: 0644
+      notify:
+        - restart systemd-resolved
       with_items: "{{ dns_resolvers_ns }}"
 
-# - name: filesystem mount points
-#   mount:
-#     path: "{{ item.path }}"
-#     src: "{{ item.src }}"
-#     fstype: "{{ item.fstype }}"
-#     state: mounted
-#     backup: yes
-#   with_items: "{{ fs_mounts }}"
+- name: configure dns for docker
+  ansible.builtin.template:
+    src: templates/docker-daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart docker
+  when: '"docker-ce" in packages'
+
+- name: filesystem mount points
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.fstype }}"
+    state: mounted
+    backup: yes
+  with_items: "{{ fs_mounts }}"
 
 - name: firewall setup
   ansible.builtin.include_tasks: firewall-rules.yaml

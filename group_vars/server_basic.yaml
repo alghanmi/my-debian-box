@@ -12,6 +12,7 @@ packages: "{{ package_list.base                   |
   unique }}"
 
 python_packages: "{{  python_package_list.base    |
+  union(python_package_list.docker | default([])) |
   union(group_python_packages | default([]))      |
   union(host_python_packages  | default([]))      |
   unique }}"

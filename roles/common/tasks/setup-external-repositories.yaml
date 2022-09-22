@@ -16,7 +16,7 @@
         checksum: sha256:1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570
     
     - name: de-armor gpg key
-      ansible.builtin.command:  gpg --output /usr/share/keyrings/docker-archive-keyring.gpg --dearmor /usr/share/gpg-keyrings/docker-archive-keyring.gpg.asc
+      ansible.builtin.command: gpg --output /usr/share/keyrings/docker-archive-keyring.gpg --dearmor /usr/share/gpg-keyrings/docker-archive-keyring.gpg.asc
       no_log: true
       args:
         creates: /usr/share/keyrings/docker-archive-keyring.gpg
@@ -28,3 +28,25 @@
         update_cache: true
 
   when: '"docker-ce" in packages'
+
+- name: install tailscale
+  block:
+    - name: download tailscale gpg key
+      ansible.builtin.get_url:
+        url: https://pkgs.tailscale.com/stable/ubuntu/jammy.gpg
+        dest: /usr/share/gpg-keyrings/tailscale-archive-keyring.gpg.asc
+        checksum: sha256:53c6f7dfbd774839d9f37e6c5022ba952108aba9a0e556a56f292a9eb605d7cf
+    
+    - name: de-armor gpg key
+      ansible.builtin.command: gpg --output /usr/share/keyrings/tailscale-archive-keyring.gpg --dearmor /usr/share/gpg-keyrings/tailscale-archive-keyring.gpg.asc
+      no_log: true
+      args:
+        creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    
+    - name: add tailscale repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: true
+
+  when: '"tailscale" in packages'
