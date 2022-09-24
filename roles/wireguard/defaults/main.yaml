@@ -1,4 +1,0 @@
----
-wireguard_server_address: 192.168.100.1
-wireguard_port: 51820
-wireguard_peers: []
