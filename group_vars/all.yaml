@@ -6,6 +6,7 @@ package_list:
     - openssh-server
     - openssl
     - openssh-client
+    - snapd
     - sudo
     - systemd-timesyncd
     - whiptail
