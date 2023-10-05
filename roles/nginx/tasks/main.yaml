@@ -1,0 +1,101 @@
+---
+- name: install nginx
+  block:
+    - name: download nginx gpg key
+      ansible.builtin.get_url:
+        url: http://nginx.org/keys/nginx_signing.key
+        dest: /usr/share/gpg-keyrings/nginx-archive-keyring.gpg.asc
+        checksum: sha256:dd4da5dc599ef9e7a7ac20a87275024b4923a917a306ab5d53fa77871220ecda
+    
+    - name: de-armor gpg key
+      ansible.builtin.command: gpg --output /usr/share/keyrings/nginx-archive-keyring.gpg --dearmor /usr/share/gpg-keyrings/nginx-archive-keyring.gpg.asc
+      no_log: true
+      args:
+        creates: /usr/share/keyrings/nginx-archive-keyring.gpg
+    
+    - name: add nginx repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ {{ ansible_distribution_release }} nginx"
+        state: present
+        update_cache: true
+
+
+- name: install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+
+- name: enable nginx service
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: yes
+    state: started
+
+- name: setup certbot (lets encrypt)
+  ansible.builtin.include_tasks: certbot.yaml
+
+- name: nginx configuration
+  ansible.builtin.template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+    backup: yes
+  notify:
+    - restart nginx
+
+- name: nginx mime-types
+  ansible.builtin.template:
+    src: templates/mime.types.j2
+    dest: /etc/nginx/mime.types
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+    backup: yes
+  notify:
+    - restart nginx
+
+- name: create proxy configuration directory
+  ansible.builtin.file:
+    path: /etc/nginx/default-proxy-conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: default server configuration
+  ansible.builtin.template:
+    src: templates/default.conf.j2
+    dest: /etc/nginx/conf.d/default.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+    backup: yes
+  notify:
+    - restart nginx
+
+- name: create default home page path
+  ansible.builtin.file:
+    path: /var/www/html/
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: 0755
+
+- name: nginx default home page
+  ansible.builtin.template:
+    src: templates/index.html.j2
+    dest: /var/www/html/index.html
+    owner: nginx
+    group: nginx
+    mode: "u=rw,g=r,o=r"
+    backup: yes
+
+- name: create diffie-hellman key exchange parameters
+  ansible.builtin.shell: openssl dhparam -out /etc/nginx/dhparam.pem 4096
+  args:
+    creates: /etc/nginx/dhparam.pem
+  notify:
+    - restart nginx

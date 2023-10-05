@@ -1,0 +1,3 @@
+---
+default_location_config: "try_files $uri $uri/ =404;"
+ocsp_resolver: 1.1.1.1

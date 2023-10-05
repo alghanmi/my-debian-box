@@ -1,0 +1,73 @@
+# {{ ansible_managed }}
+
+server {
+    listen 80 default_server deferred;
+    listen [::]:80 default_server deferred;
+
+    # Redirect all HTTP requests to HTTPS with a 301 Moved Permanently response.
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    # Set server-name
+    server_name {{ default_fqdn | default(inventory_hostname) }};
+
+    # Set index files and document root
+    root  /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    # Specify a charset
+    charset utf-8;
+
+    # certs sent to the client in SERVER HELLO are concatenated in ssl_certificate
+    ssl_certificate     /etc/letsencrypt/live/{{ default_fqdn | default(inventory_hostname) }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ default_fqdn | default(inventory_hostname) }}/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_tickets off;
+
+    # modern configuration. tweak to your needs.
+    ssl_protocols             TLSv1.2 TLSv1.3;
+    ssl_ciphers               EECDH+AESGCM:EDH+AESGCM;
+    ssl_ecdh_curve            secp384r1;
+    ssl_dhparam               /etc/nginx/dhparam.pem;
+    ssl_prefer_server_ciphers on;
+
+    # HSTS (ngx_http_headers_module is required) (15768000 seconds = 6 months)
+    add_header Strict-Transport-Security max-age=15768000;
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+
+    # OCSP Stapling ---
+    # fetch OCSP records from URL in ssl_certificate and cache them
+    ssl_stapling            on;
+    ssl_stapling_verify     on;
+    ssl_trusted_certificate /etc/letsencrypt/live/{{ default_fqdn | default(inventory_hostname) }}/chain.pem;
+
+    # DNS resolver for OCSP Stapeling
+    resolver {{ ocsp_resolver | default(1.1.1.1) }};
+    resolver_timeout 5s;
+
+    # Default location
+    location / {
+        {{ default_location_config }}
+    }
+
+    # Block access to all hidden files and directories with the exception of
+    # the visible content from within the `/.well-known/` hidden directory.
+    location ~* /\.(?!well-known\/) {
+        deny all;
+    }
+
+    # Block access to files that can expose sensitive information.
+    location ~* (?:#.*#|\.(?:bak|conf|dist|fla|in[ci]|log|orig|psd|sh|sql|sw[op])|yaml|yml|~)$ {
+        deny all;
+    }
+
+    # Include proxy configuration
+    include /etc/nginx/default-proxy-conf.d/*.conf;
+}

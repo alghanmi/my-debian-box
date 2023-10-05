@@ -1,0 +1,42 @@
+---
+
+- name: download unifi gpg key
+  ansible.builtin.get_url:
+    url: https://dl.ui.com/unifi/unifi-repo.gpg
+    dest: /usr/share/keyrings/unifi-repo.gpg
+    checksum: sha256:f4625b8f05619d506961d64ca25c262d4a033acf4d1f5303babd7f5b9a971207
+
+- name: add unifi repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/unifi-repo.gpg] https://www.ui.com/downloads/unifi/debian stable ubiquiti"
+    state: present
+    update_cache: true
+
+- name: Install software packages (apt)
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - unifi
+
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  notify:
+    - apt autoclean
+    - apt autoremove
+
+- name: allow unifi controller ports (tcp)
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port | string }}"
+    proto: "{{ item.protocol | string }}"
+  with_items:
+    - { "protocol": "udp", "port": "3478"}  # STUN
+    - { "protocol": "udp", "port": "10001"} # device discovery.
+    - { "protocol": "tcp", "port": "8080"}  # device and application communication
+    - { "protocol": "tcp", "port": "443"}   # application GUI/API as seen in a web browser.
+    - { "protocol": "tcp", "port": "8443"}  # application GUI/API as seen in a web browser.
+    - { "protocol": "tcp", "port": "6789"}  # UniFi mobile speed test.
+  notify:
+    - update ufw

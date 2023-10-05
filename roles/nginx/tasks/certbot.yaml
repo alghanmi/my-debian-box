@@ -1,0 +1,42 @@
+---
+- name: install certbot
+  community.general.snap:
+    name: certbot
+    classic: yes
+    options:
+      - trust-plugin-with-root=ok
+
+- name: install certbot-dns plugin
+  community.general.snap:
+    name: certbot-dns-cloudflare
+
+- name: create certbot-dns configuration directory
+  ansible.builtin.file:
+    path: /etc/cloudflare
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: configure certbot-dns credentials
+  template:
+    src: templates/cloudflare.ini.j2
+    dest: /etc/cloudflare/cloudflare.ini
+    owner: root
+    group: root
+    mode: 0600
+
+- name: symlink certbot into place.
+  ansible.builtin.file:
+    src: /snap/bin/certbot
+    dest: /usr/bin/certbot
+    state: link
+
+- name: check if certificate exists
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/{{ default_fqdn | default(inventory_hostname) }}
+  register: le_cert
+
+- name: generate certificate if it does not exist
+  ansible.builtin.shell: certbot --authenticator dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare/cloudflare.ini --installer nginx certonly --noninteractive --agree-tos --email {{ letsencrypt_email }} --domains {{ default_fqdn | default(inventory_hostname) }}
+  when: le_cert.stat.exists == false

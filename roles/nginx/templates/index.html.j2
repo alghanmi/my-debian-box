@@ -1,0 +1,21 @@
+<!-- {{ ansible_managed }} -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Welcome to {{ default_fqdn | default(inventory_hostname) }}!</title>
+        <meta charset="UTF-8">
+        <style>
+            body {
+                width: 35em;
+                margin: 0 auto;
+                font-family: Tahoma, Verdana, Arial, sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome to {{ default_fqdn | default(inventory_hostname) }}!</h1>
+        <p>This is a landing page for {{ default_fqdn | default(inventory_hostname) }}</p>
+
+        <p><em>Thank you for stopping by</em></p>
+    </body>
+</html>

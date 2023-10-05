@@ -5,9 +5,27 @@
   gather_facts: yes
 
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: common
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: user-setup
       with_items: "{{ superusers | default([]) }}"
+
+- hosts: unifi
+  become: yes
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+    - ansible.builtin.include_role:
+        name: unifi
+
+- hosts: webserver
+  become: yes
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+    - ansible.builtin.include_role:
+        name: nginx

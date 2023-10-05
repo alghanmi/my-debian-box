@@ -1,0 +1,16 @@
+---
+- name: apt update
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: apt autoclean
+  ansible.builtin.apt:
+    autoclean: yes
+
+- name: apt autoremove
+  ansible.builtin.apt:
+    autoremove: yes
+
+- name: update ufw
+  community.general.ufw:
+    state: reloaded
