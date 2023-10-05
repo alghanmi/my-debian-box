@@ -3,6 +3,8 @@ backports: false
 partner_repos: false
 install_nonpackaged_software: false
 
+editor_alternative: /usr/bin/vim.basic
+
 unattended_upgrades: false
 unattended_upgrades_all_origins: false
 unattended_upgrades_auto_reboot: false
@@ -21,10 +23,17 @@ user_groups:
 
 fs_mounts: []
 
+firewall_allow_src_tcp: []
 open_ports_tcp:
   - 22
 
+firewall_allow_src_udp: []
 open_ports_udp: []
+
+enable_tailscale_only_ports: false
+tailscale_only_tcp_ports: []
+tailscale_only_udp_ports: []
+tailscale_interface: tailscale0
 
 dns_resolvers_ns: []
 dns_resolvers_dns_over_tls: false

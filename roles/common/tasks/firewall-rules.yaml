@@ -1,4 +1,48 @@
 ---
+- name: set tailscale status (when tailscale is installed)
+  ansible.builtin.shell:
+    cmd: tailscale status --json | jq --raw-output '.BackendState' > /var/run/tailscale.state
+    creates: /var/run/tailscale.state
+  when: "'tailscale' in ansible_facts.packages"
+
+- name: check tailscale status
+  ansible.builtin.copy:
+    content: "NotInstalled"
+    dest: /var/run/tailscale.state
+  when: "'tailscale' not in ansible_facts.packages"
+
+- name: read current tailscale backend-state
+  ansible.builtin.slurp:
+    src: /var/run/tailscale.state
+  register: tailscale_backendstate_file
+
+- name: create a fact for tailscale backend-state
+  ansible.builtin.set_fact:
+    tailscale_backendstate: "{{ tailscale_backendstate_file.content | b64decode  | trim }}"
+
+- name: actions when tailscale is installed but not configured
+  block:
+    - name: send slack message if tailscale is not running
+      ansible.builtin.shell:
+        cmd: echo "Tailscale Backend State is '{{ tailscale_backendstate }}'. Please check Tailscale configuration" | slacktee -c "alerts"  -a "danger" -t "Tailscale Error" --field "Host" "$(hostname)" --field "Host Time" "$(date)"
+    - name: delete tailscale state
+      ansible.builtin.file:
+        path: /var/run/tailscale.state
+        state: absent
+  when: tailscale_backendstate != "Running" and 'tailscale' in ansible_facts.packages
+
+- name: get list of open tcp ports (if tailscale is enabled)
+  ansible.builtin.set_fact:
+    ufw_allow_ports_tcp: "{{ open_ports_tcp | reject('in', tailscale_only_tcp_ports) | list }}"
+    ufw_allow_ports_udp: "{{ open_ports_udp | reject('in', tailscale_only_udp_ports) | list }}"
+  when: enable_tailscale_only_ports and '"tailscale" in packages'
+
+- name: get list of open tcp ports (if tailscale is not enabled)
+  ansible.builtin.set_fact:
+    ufw_allow_ports_tcp: "{{ open_ports_tcp | list }}"
+    ufw_allow_ports_udp: "{{ open_ports_udp | list }}"
+  when: enable_tailscale_only_ports == false or tailscale_backendstate != "Running"
+
 - name: install ufw
   ansible.builtin.apt:
     name:
@@ -10,14 +54,81 @@
     rule: allow
     port: "{{ item | string }}"
     proto: tcp
-  with_items: "{{ open_ports_tcp }}"
+  with_items: "{{ ufw_allow_ports_tcp }}"
+  notify:
+    - update ufw
+
+- name: ufw (tcp) from src
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port | string }}"
+    proto: tcp
+    from_ip: "{{ item.src | string }}"
+  with_items: "{{ firewall_allow_src_tcp }}"
+  notify:
+    - update ufw
 
 - name: ufw (udp)
   community.general.ufw:
     rule: allow
     port: "{{ item | string }}"
     proto: udp
-  with_items: "{{ open_ports_udp }}"
+  with_items: "{{ ufw_allow_ports_udp }}"
+  notify:
+    - update ufw
+
+- name: ufw (udp) from src
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port | string }}"
+    proto: udp
+    from_ip: "{{ item.src | string }}"
+  with_items: "{{ firewall_allow_src_udp }}"
+  notify:
+    - update ufw
+
+- name: allow tailscale ports to come-in only on tailscale interface
+  block:
+    - name: allow tailscale ports on tailscale interface (tcp)
+      community.general.ufw:
+        rule: allow
+        port: "{{ item | string }}"
+        proto: tcp
+        interface_in: "{{ tailscale_interface }}"
+      with_items: "{{ tailscale_only_tcp_ports }}"
+      notify:
+        - update ufw
+
+    - name: allow tailscale ports on tailscale interface (udp)
+      community.general.ufw:
+        rule: allow
+        port: "{{ item | string }}"
+        proto: udp
+        interface_in: "{{ tailscale_interface }}"
+      with_items: "{{ tailscale_only_udp_ports }}"
+      notify:
+        - update ufw
+
+    - name: remove firewall rules for services over tailscale (tcp)
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+        delete: true
+      with_items: "{{ tailscale_only_tcp_ports }}"
+      notify:
+        - update ufw
+    
+    - name: remove firewall rules for services over tailscale (udp)
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: udp
+        delete: true
+      with_items: "{{ tailscale_only_udp_ports }}"
+      notify:
+        - update ufw
+  when: enable_tailscale_only_ports and tailscale_backendstate == "Running"
 
 - name: set default ufw policies
   community.general.ufw:
@@ -27,6 +138,8 @@
     - { direction: "incoming", policy: "deny" }
     - { direction: "routed", policy: "deny" }
     - { direction: "outgoing", policy: "allow" }
+  notify:
+    - update ufw
 
 - name: Enable ufw
   community.general.ufw:

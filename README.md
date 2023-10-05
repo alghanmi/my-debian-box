@@ -20,9 +20,19 @@ Before using [playbooks](https://docs.ansible.com/ansible/latest/user_guide/play
 Ansible is an agentless configuration management and orchestration tool. Most of the software packages ansible needs on the managed hosts are already baked into any basic OS setup (e.g. `sudo`, `python`). For best results, ensure that the following packages are installed on any node you want to manage with Ansible:
 ```bash
 apt update
-apt install sudo apt-transport-https dirmngr python python-simplejson
+apt install apt-transport-https ca-certificates lsb-release python3 software-properties-common sudo
 ```
 It is advisable to add this script to your `cloud-init` or `userdata`.
+
+```
+export HOST=matrix.alghanmi.net
+export SSH_AUTHORIZED_KEYS_URL=https://github.com/alghanmi.keys
+
+ssh -l root $HOST 'apt update && apt dist-upgrade'
+ssh -l root $HOST 'apt install --yes apt-transport-https ca-certificates curl lsb-release python3 software-properties-common sudo && apt clean && apt autoremove'
+ssh -l root $HOST "curl --silent --location --output /root/.ssh/authorized_keys $SSH_AUTHORIZED_KEYS_URL"
+ssh -l root $HOST 'shutdown -r now'
+```
 
 ### Remote User Setup
 For this repository, we assume that you will be using [SSH Public Key Authentication](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server). Therefore, make sure your `ssh-agent` already has your key loaded before running our Ansible playbooks. If you are using password-based authentication, then you will need to:
@@ -47,3 +57,11 @@ ansible-playbook -i hosts setup-hosts.yaml --user root
 - Personal YADM
 - Setup GPG Sockets on source and estination
 - GPG Remote Forwarding https://www.ecliptik.com/Forwarding-gpg-agent-over-SSH/, https://gist.github.com/TimJDFletcher/85fafd023c81aabfad57454111c1564d
+
+
+
+# Synapse
+## Initial Setup
+```
+sudo docker compose --file /etc/matrix/synapse/docker-compose.yaml run synapse generate
+```

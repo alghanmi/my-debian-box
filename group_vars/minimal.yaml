@@ -1,0 +1,12 @@
+---
+group_packages: []
+group_python_packages: []
+
+packages: "{{ package_list.base                   |
+  union(package_list.basic)                       |
+  union(package_list.shell)                       |
+  union(group_packages | default([]))             |
+  union(host_packages  | default([]))             |
+  unique }}"
+
+python_packages: []

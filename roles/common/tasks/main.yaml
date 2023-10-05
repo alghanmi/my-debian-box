@@ -2,7 +2,6 @@
 - name: Update aptitude repo and cache on all
   ansible.builtin.apt:
     update_cache: yes
-    cache_valid_time: 3600
     autoclean: yes
 
 - name: install ansible dependencies
@@ -25,7 +24,7 @@
 - name: update editor alternatives
   community.general.alternatives:
     name: editor
-    path: /usr/bin/vim.basic
+    path: "{{ editor_alternative }}"
 
 - name: create user groups
   ansible.builtin.group:
@@ -109,9 +108,6 @@
     backup: yes
   with_items: "{{ fs_mounts }}"
 
-- name: firewall setup
-  ansible.builtin.include_tasks: firewall-rules.yaml
-
 - name: install slacktee for alerts
   ansible.builtin.include_tasks: install-slacktee.yaml
 
@@ -124,5 +120,12 @@
   when: unattended_upgrades
 
 - name: Autoremove unused packages
-  apt:
+  ansible.builtin.apt:
     autoremove: yes
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: firewall setup
+  ansible.builtin.include_tasks: firewall-rules.yaml

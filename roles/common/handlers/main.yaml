@@ -35,3 +35,7 @@
   ansible.builtin.service:
     name: docker
     state: restarted
+
+- name: update ufw
+  community.general.ufw:
+    state: reloaded
